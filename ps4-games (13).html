@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1115">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="بازی‌های PS4">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi2YTbjNiz2Kog2KjYp9iy24zigIzZh9inLNzZgSBQUzQiLCJzaG9ydF9uYW1lIjoiUFM0IEdhbWVzIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjExMTUiLCJ0aGVtZV9jb2xvciI6IiMwZjExMTUifQ==">
+<title>Persian Store</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#1a1d24;
+    --accent:#3b82f6;
+    --text:#e8e9ec;
+    --muted:#8a8f98;
+    --green:#22c55e;
+    --surface0:#0f1115;
+    --surface1:#22252d;
+    --border:#2a2e37;
+    --header-bg:#12141a;
+    --danger:#ef4444;
+    --shadow:0 2px 6px rgba(0,0,0,.3);
+  }
+  html[data-theme="light"]{
+    --bg:#e9eaed;
+    --card:#d9dbe0;
+    --accent:#2563eb;
+    --text:#1e2330;
+    --muted:#6b7280;
+    --green:#16a34a;
+    --surface0:#f0f1f3;
+    --surface1:#cfd2d8;
+    --border:#aeb2ba;
+    --header-bg:#e9eaed;
+    --danger:#dc2626;
+    --shadow:none;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Vazirmatn', Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  header{
+    position:sticky; top:0; z-index:10;
+    background:linear-gradient(180deg,var(--header-bg) 90%,transparent);
+    padding:20px 16px 12px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+  }
+  header h1{
+    margin:0 0 10px;
+    font-size:22px;
+    letter-spacing:.5px;
+  }
+  header .count{
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:10px;
+  }
+  #search{
+    width:100%;
+    max-width:420px;
+    padding:12px 16px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface1);
+    color:var(--text);
+    font-size:15px;
+    outline:none;
+    margin-bottom:12px;
+  }
+  #search:focus{border-color:var(--accent);}
+  #chips{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    max-width:900px;
+    margin:0 auto 10px;
+    padding:0 8px;
+  }
+  .chip{
+    padding:7px 14px;
+    border-radius:999px;
+    background:var(--surface1);
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    user-select:none;
+    transition:background .15s ease, color .15s ease;
+  }
+  .chip.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  #sortRow{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+  }
+  #sortRow .chip{ font-size:12px; padding:6px 12px; }
+
+  #platformRow{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  #platformRow .platform-chip{
+    font-size:14px;
+    font-weight:bold;
+    padding:8px 24px;
+  }
+  #platformRow .platform-chip.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+
+  /* popular strip */
+  #popularWrap{
+    max-width:1200px;
+    margin:14px auto 4px;
+    padding:0 16px;
+  }
+  #popularWrap h3{
+    font-size:14px;
+    color:var(--muted);
+    margin:0 0 8px;
+    font-weight:normal;
+  }
+  #popularStrip{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pop-card{
+    flex:0 0 auto;
+    width:90px;
+    background:var(--card);
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+    text-align:center;
+  }
+  .pop-cover{
+    width:100%;
+    aspect-ratio:3/4;
+    background:var(--surface1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .pop-cover img{ width:100%; height:100%; object-fit:cover; }
+  .pop-title{
+    font-size:10px;
+    padding:5px 4px;
+    line-height:1.3;
+  }
+
+  #grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:14px;
+    padding:16px;
+    max-width:1200px;
+    margin:0 auto;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .15s ease;
+    scroll-margin-top:140px;
+  }
+  .card:active{transform:scale(.97);}
+  .cover-wrap{
+    width:100%;
+    aspect-ratio:3/4;
+    background:var(--surface1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+  .cover-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .cover-wrap svg{
+    width:40%;
+    opacity:.35;
+  }
+  .new-badge{
+    position:absolute;
+    top:6px;
+    right:6px;
+    background:var(--danger);
+    color:#fff;
+    font-size:10px;
+    padding:3px 7px;
+    border-radius:999px;
+  }
+  .title{
+    padding:8px 10px 4px;
+    font-size:13px;
+    line-height:1.4;
+    text-align:center;
+    color:var(--text);
+  }
+  .title .tick{ color:var(--green); }
+  .genre-tag{
+    text-align:center;
+    font-size:11px;
+    color:var(--accent);
+    padding-bottom:8px;
+  }
+  .size-tag{
+    text-align:center;
+    font-size:11px;
+    color:var(--muted);
+    padding-bottom:8px;
+  }
+  .add-btn{
+    display:block;
+    width:calc(100% - 16px);
+    margin:0 8px 8px;
+    padding:8px 0;
+    border:none;
+    border-radius:8px;
+    background:var(--border);
+    color:var(--text);
+    font-size:12px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .add-btn.selected{
+    background:var(--accent);
+    color:#fff;
+  }
+  .trailer-btn{
+    display:block;
+    width:calc(100% - 16px);
+    margin:0 8px 10px;
+    padding:8px 0;
+    border-radius:8px;
+    background:transparent;
+    border:1px solid var(--green);
+    color:var(--green);
+    font-size:12px;
+    font-family:inherit;
+    text-align:center;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  #empty{
+    display:none;
+    text-align:center;
+    color:var(--muted);
+    padding:40px 10px;
+  }
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:11px;
+    padding:20px 20px 100px;
+    line-height:2;
+  }
+  footer .credit{
+    display:inline-block;
+    margin-top:4px;
+    opacity:.7;
+    font-size:10px;
+    letter-spacing:.2px;
+  }
+
+  /* alphabet jump nav */
+  #alphaNav{
+    position:fixed;
+    top:50%;
+    left:4px;
+    transform:translateY(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    z-index:15;
+    background:rgba(26,29,36,.7);
+    border-radius:10px;
+    padding:4px 2px;
+    max-height:70vh;
+    overflow-y:auto;
+  }
+  #alphaNav button{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:10px;
+    padding:2px 4px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+
+  /* scroll to top */
+  #topBtn{
+    position:fixed;
+    bottom:80px;
+    left:16px;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    font-size:18px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  #topBtn.show{ display:flex; }
+
+  /* floating cart bar */
+  #cartBar{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:var(--header-bg);
+    border-top:1px solid var(--border);
+    padding:12px 16px;
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    z-index:20;
+  }
+  #cartBar.show{ display:flex; }
+  #cartCount{
+    font-size:14px;
+    color:var(--text);
+  }
+  #cartActions{ display:flex; gap:8px; }
+  #clearCartBtn{
+    background:var(--border);
+    color:var(--muted);
+    border:none;
+    border-radius:999px;
+    padding:10px 14px;
+    font-size:13px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  #cartBtn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:10px 20px;
+    font-size:14px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+
+  /* modal */
+  #overlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:30;
+    padding:16px;
+  }
+  #overlay.show{ display:flex; }
+  #modal{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  #modal h2{
+    margin:0 0 14px;
+    font-size:17px;
+    text-align:center;
+  }
+  #modal input{
+    width:100%;
+    padding:12px 14px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--surface0);
+    color:var(--text);
+    font-size:14px;
+    margin-bottom:6px;
+    outline:none;
+    font-family:inherit;
+  }
+  #modal input:focus{ border-color:var(--accent); }
+  #nameError{
+    color:var(--danger);
+    font-size:12px;
+    min-height:16px;
+    margin-bottom:6px;
+  }
+  #selectedList{
+    list-style:none;
+    padding:0;
+    margin:10px 0 16px;
+    max-height:180px;
+    overflow-y:auto;
+  }
+  #totalSizeLine{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    margin:-8px 0 14px;
+  }
+  #selectedList li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--surface0);
+    padding:8px 12px;
+    border-radius:8px;
+    margin-bottom:6px;
+    font-size:13px;
+  }
+  #selectedList button{
+    background:none;
+    border:none;
+    color:var(--danger);
+    font-size:16px;
+    cursor:pointer;
+    padding:0 4px;
+  }
+  .modal-actions{
+    display:flex;
+    gap:10px;
+  }
+  .modal-actions button{
+    flex:1;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    font-size:14px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  #closeModal{
+    background:var(--border);
+    color:var(--text);
+  }
+  #copyModal{
+    background:var(--border);
+    color:var(--text);
+  }
+  #sendModal{
+    background:var(--accent);
+    color:#fff;
+  }
+  #copyToast{
+    position:fixed;
+    bottom:100px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--green);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13px;
+    display:none;
+    z-index:50;
+  }
+  #copyToast.show{ display:block; }
+
+  /* theme toggle */
+  #themeToggle{
+    position:fixed;
+    top:14px;
+    left:14px;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:25;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+</style>
+</head>
+<body>
+
+<button id="themeToggle" title="تغییر تم">🌙</button>
+
+<header>
+  <h1>🎮 Persian Store</h1>
+  <div class="count" id="count"></div>
+  <input id="search" type="text" placeholder="جستجوی نام بازی...">
+  <div id="platformRow">
+    <div class="chip platform-chip active" data-platform="ps4">PS4</div>
+    <div class="chip platform-chip" data-platform="ps5">PS5</div>
+  </div>
+  <div id="chips"></div>
+  <div id="sortRow">
+    <div class="chip active" data-sort="default">پیش‌فرض</div>
+    <div class="chip" data-sort="alpha">الفبایی (A-Z)</div>
+  </div>
+</header>
+
+<div id="popularWrap">
+  <h3>🔥 پرطرفدارترین‌ها (دارای تریلر)</h3>
+  <div id="popularStrip"></div>
+</div>
+
+<div id="grid"></div>
+<div id="empty">بازی‌ای با این مشخصات پیدا نشد.</div>
+
+<footer><span class="credit">طراحی سایت: طاها صوفی</span></footer>
+
+<div id="alphaNav"></div>
+<button id="topBtn">↑</button>
+
+<div id="cartBar">
+  <div id="cartCount"></div>
+  <div id="cartActions">
+    <button id="clearCartBtn">پاک کردن</button>
+    <button id="cartBtn">ثبت درخواست</button>
+  </div>
+</div>
+
+<div id="overlay">
+  <div id="modal">
+    <h2>ثبت درخواست نصب بازی</h2>
+    <input id="fullName" type="text" placeholder="نام و نام خانوادگی">
+    <div id="nameError"></div>
+    <ul id="selectedList"></ul>
+    <div id="totalSizeLine"></div>
+    <div class="modal-actions">
+      <button id="closeModal">بستن</button>
+      <button id="copyModal">کپی متن</button>
+      <button id="sendModal">ارسال پیامک</button>
+    </div>
+  </div>
+</div>
+
+<div id="copyToast">متن کپی شد ✅</div>
+
+<script>
+const games = [
+{n:"A Way Out", g:"اکشن ماجراجویی", s:16, c:"PS4"},
+{n:"Ace Combat 7: Skies Unknown", g:"شوتینگ", s:35, c:"PS4"},
+{n:"Alan Wake Remastered", g:"ترسناک", s:28, c:"PS4"},
+{n:"AO Tennis 2", g:"ورزشی", c:"PS4"},
+{n:"Assassin's Creed Origins", g:"جهان باز", s:47, c:"PS4"},
+{n:"Assassin's Creed Syndicate", g:"جهان باز", s:37, c:"PS4"},
+{n:"Assassin's Creed Odyssey", g:"جهان باز", s:42, c:"PS4"},
+{n:"Assassin's Creed Valhalla", g:"جهان باز", s:85, c:"PS4"},
+{n:"Assassin's Creed Mirage", g:"جهان باز", s:40, c:"PS4"},
+{n:"Atomic Heart", g:"شوتینگ", c:"PS4"},
+{n:"Batman: Arkham Knight", g:"اکشن ماجراجویی", s:44, c:"PS4"},
+{n:"Battlefield 1", g:"شوتینگ", s:39, c:"PS4"},
+{n:"Battlefield 4", g:"شوتینگ", c:"PS4"},
+{n:"Battlefield V", g:"شوتینگ", s:32, c:"PS4"},
+{n:"Beat Saber", g:"خانوادگی", c:"PS4"},
+{n:"Ben 10: Power Trip", g:"خانوادگی", s:4, c:"PS4"},
+{n:"Bloodborne", g:"نقش‌آفرینی", s:30, c:"PS4"},
+{n:"Call of Duty: Black Ops III", g:"شوتینگ", s:45, c:"PS4"},
+{n:"Call of Duty: Black Ops Cold War", g:"شوتینگ", s:140, c:"PS4"},
+{n:"Call of Duty: Ghosts", g:"شوتینگ", s:32, c:"PS4"},
+{n:"Call of Duty: Modern Warfare Remastered", g:"شوتینگ", c:"PS4"},
+{n:"Call of Duty: Modern Warfare 2 Campaign Remastered", g:"شوتینگ", s:45, c:"PS4"},
+{n:"Call of Duty: Modern Warfare (2019)", g:"شوتینگ", s:89, c:"PS4"},
+{n:"Call of Duty: Modern Warfare II", g:"شوتینگ", s:146, c:"PS4"},
+{n:"Call of Duty: Modern Warfare III", g:"شوتینگ", s:110, c:"PS4"},
+{n:"Call of Duty: Vanguard", g:"شوتینگ", s:73, c:"PS4"},
+{n:"Call of Duty: WWII", g:"شوتینگ", s:60, c:"PS4"},
+{n:"Captain Tsubasa: Rise of New Champions", g:"ورزشی", c:"PS4"},
+{n:"Crash Bandicoot 4: It's About Time", g:"پلتفرمر", s:22, c:"PS4"},
+{n:"Crash Bandicoot N. Sane Trilogy", g:"پلتفرمر", s:22, c:"PS4"},
+{n:"Crash Team Racing Nitro-Fueled", g:"ریسینگ", s:17, c:"PS4"},
+{n:"Crysis Remastered", g:"شوتینگ", s:12, c:"PS4"},
+{n:"Crysis 2 Remastered", g:"شوتینگ", s:17, c:"PS4"},
+{n:"Hollow Knight", g:"ایندی", c:"PS4"},
+{n:"Hollow Knight: Silksong", g:"ایندی", s:5, c:"PS4", isNew:true},
+{n:"Cyberpunk 2077", g:"جهان باز", s:114, c:"PS4"},
+{n:"Dark Souls III", g:"نقش‌آفرینی", s:17, c:"PS4"},
+{n:"Days Gone", g:"جهان باز", s:64, c:"PS4"},
+{n:"Death Stranding", g:"اکشن ماجراجویی", s:46, c:"PS4"},
+{n:"Detroit: Become Human", g:"اکشن ماجراجویی", s:40, c:"PS4"},
+{n:"Devil May Cry 5", g:"اکشن ماجراجویی", s:30, c:"PS4"},
+{n:"DOOM Eternal", g:"شوتینگ", s:55, c:"PS4"},
+{n:"DRIVECLUB", g:"ریسینگ", s:51, c:"PS4"},
+{n:"Dying Light 2 Stay Human", g:"جهان باز", s:20, c:"PS4"},
+{n:"EA Sports FC 24", g:"ورزشی", c:"PS4"},
+{n:"EA Sports FC 25", g:"ورزشی", s:43, c:"PS4"},
+{n:"EA Sports FC 26", g:"ورزشی", s:76, c:"PS4", isNew:true},
+{n:"EA Sports UFC 4", g:"ورزشی", s:30, c:"PS4"},
+{n:"eFootball PES 2021", g:"ورزشی", s:40, c:"PS4"},
+{n:"Elden Ring", g:"نقش‌آفرینی", s:55, c:"PS4"},
+{n:"NBA 2K24", g:"ورزشی", c:"PS4"},
+{n:"Evil West", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"F1 2022", g:"ریسینگ", c:"PS4"},
+{n:"Far Cry 3", g:"جهان باز", c:"PS4"},
+{n:"Far Cry 5", g:"جهان باز", s:34, c:"PS4"},
+{n:"Far Cry 6", g:"جهان باز", s:35, c:"PS4"},
+{n:"Far Cry New Dawn", g:"جهان باز", c:"PS4"},
+{n:"Far Cry Primal", g:"جهان باز", s:12, c:"PS4"},
+{n:"Farming Simulator 22", g:"شبیه‌سازی", c:"PS4"},
+{n:"Fast & Furious Crossroads", g:"ریسینگ", c:"PS4"},
+{n:"FIFA 23", g:"ورزشی", c:"PS4"},
+{n:"Gang Beasts", g:"خانوادگی", c:"PS4"},
+{n:"Ghost of Tsushima", g:"جهان باز", s:35, c:"PS4"},
+{n:"Ghostrunner 2", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"God of War III", g:"اکشن ماجراجویی", s:39, c:"PS4"},
+{n:"God of War Ragnarök", g:"اکشن ماجراجویی", s:113, c:"PS4"},
+{n:"God of War (2018 video game)", g:"اکشن ماجراجویی", s:37, c:"PS4"},
+{n:"Gran Turismo 7", g:"ریسینگ", s:80, c:"PS4"},
+{n:"Gran Turismo Sport", g:"ریسینگ", c:"PS4"},
+{n:"Grand Theft Auto III", g:"جهان باز", s:5, c:"PS4"},
+{n:"Grand Theft Auto: San Andreas", g:"جهان باز", c:"PS4"},
+{n:"Grand Theft Auto V", g:"جهان باز", s:78, c:"PS4"},
+{n:"Grand Theft Auto: Vice City", g:"جهان باز", s:11, c:"PS4"},
+{n:"Green Hell", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Hitman 2 (2018 video game)", g:"اکشن ماجراجویی", s:56, c:"PS4"},
+{n:"Hitman 3", g:"اکشن ماجراجویی", s:65, c:"PS4"},
+{n:"Hitman (2016 video game)", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Hogwarts Legacy", g:"نقش‌آفرینی", s:66, c:"PS4"},
+{n:"Horizon Forbidden West", g:"جهان باز", s:89, c:"PS4"},
+{n:"Horizon Zero Dawn", g:"جهان باز", s:40, c:"PS4"},
+{n:"Infamous: Second Son", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Injustice 2", g:"مبارزه‌ای", c:"PS4"},
+{n:"Inside (video game)", g:"ایندی", s:2, c:"PS4"},
+{n:"It Takes Two", g:"اکشن ماجراجویی", s:33, c:"PS4"},
+{n:"Just Cause 4", g:"جهان باز", s:40, c:"PS4"},
+{n:"Just Dance 2021", g:"خانوادگی", c:"PS4"},
+{n:"Kao the Kangaroo", g:"پلتفرمر", c:"PS4"},
+{n:"Kena: Bridge of Spirits", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"The King of Fighters XV", g:"مبارزه‌ای", c:"PS4"},
+{n:"Kingdom Hearts III", g:"نقش‌آفرینی", c:"PS4"},
+{n:"Knack II", g:"پلتفرمر", c:"PS4"},
+{n:"Kung Fu Panda: Showdown of Legendary Legends", g:"مبارزه‌ای", c:"PS4"},
+{n:"LEGO 2K Drivers", g:"ریسینگ", c:"PS4", s:14},
+{n:"LEGO Batman 3: Beyond Gotham", g:"پلتفرمر", s:7, c:"PS4"},
+{n:"LEGO City Undercover", g:"پلتفرمر", c:"PS4"},
+{n:"LEGO Harry Potter Collection", g:"پلتفرمر", c:"PS4"},
+{n:"LEGO Marvel Super Heroes 2", g:"پلتفرمر", s:20, c:"PS4"},
+{n:"LEGO Marvel Super Heroes", g:"پلتفرمر", s:6, c:"PS4"},
+{n:"The LEGO Movie Videogame", g:"پلتفرمر", c:"PS4"},
+{n:"LEGO Star Wars: The Skywalker Saga", g:"پلتفرمر", s:32, c:"PS4"},
+{n:"LEGO The Hobbit", g:"پلتفرمر", c:"PS4"},
+{n:"LEGO Worlds", g:"پلتفرمر", c:"PS4"},
+{n:"Lies of P", g:"نقش‌آفرینی", s:28, c:"PS4"},
+{n:"Like a Dragon: Ishin!", g:"نقش‌آفرینی", c:"PS4"},
+{n:"LIMBO (video game)", g:"ایندی", s:1, c:"PS4"},
+{n:"LittleBigPlanet 3", g:"پلتفرمر", s:11, c:"PS4"},
+{n:"Little Nightmares II", g:"ترسناک", s:4, c:"PS4"},
+{n:"LocoRoco Remastered", g:"پلتفرمر", c:"PS4"},
+{n:"Mafia: Definitive Edition", g:"جهان باز", s:42, c:"PS4"},
+{n:"Mafia II: Definitive Edition", g:"جهان باز", s:43, c:"PS4"},
+{n:"Mafia III", g:"جهان باز", s:42, c:"PS4"},
+{n:"Marvel's Avengers", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Marvel's Guardians of the Galaxy", g:"اکشن ماجراجویی", s:35, c:"PS4"},
+{n:"Marvel's Spider-Man: Miles Morales", g:"جهان باز", s:40, c:"PS4"},
+{n:"Marvel's Spider-Man", g:"جهان باز", s:41, c:"PS4"},
+{n:"Metro Exodus", g:"شوتینگ", s:45, c:"PS4"},
+{n:"Minecraft", g:"شبیه‌سازی", s:2, c:"PS4"},
+{n:"Minecraft Dungeons", g:"اکشن ماجراجویی", s:4, c:"PS4"},
+{n:"Minecraft Legends", g:"شبیه‌سازی", c:"PS4"},
+{n:"Monster Energy Supercross", g:"ورزشی", c:"PS4"},
+{n:"Mortal Kombat 11", g:"مبارزه‌ای", s:70, c:"PS4"},
+{n:"Mortal Kombat XL", g:"مبارزه‌ای", c:"PS4"},
+{n:"Naruto Shippuden: Ultimate Ninja Storm Trilogy", g:"مبارزه‌ای", c:"PS4"},
+{n:"Need for Speed Payback", g:"ریسینگ", s:22, c:"PS4"},
+{n:"Need for Speed Rivals", g:"ریسینگ", s:15, c:"PS4"},
+{n:"Need for Speed Heat", g:"ریسینگ", s:31, c:"PS4"},
+{n:"Need for Speed Hot Pursuit Remastered", g:"ریسینگ", c:"PS4"},
+{n:"Nickelodeon All-Star Brawl", g:"مبارزه‌ای", c:"PS4"},
+{n:"One Piece Odyssey", g:"نقش‌آفرینی", c:"PS4"},
+{n:"Overcooked! 2", g:"خانوادگی", s:9, c:"PS4"},
+{n:"Prince of Persia: The Lost Crown", g:"پلتفرمر", s:14, c:"PS4"},
+{n:"Prototype 2", g:"جهان باز", c:"PS4"},
+{n:"Rage 2", g:"جهان باز", c:"PS4"},
+{n:"Ratchet & Clank (2016 video game)", g:"اکشن ماجراجویی", s:26, c:"PS4"},
+{n:"Rayman Legends", g:"پلتفرمر", s:8, c:"PS4"},
+{n:"Red Dead Redemption", g:"جهان باز", s:10, c:"PS4"},
+{n:"Red Dead Redemption 2", g:"جهان باز", s:93, c:"PS4"},
+{n:"Remothered: Tormented Fathers", g:"ترسناک", c:"PS4"},
+{n:"Resident Evil 2 (2019 video game)", g:"ترسناک", s:22, c:"PS4"},
+{n:"Resident Evil 3 (2020 video game)", g:"ترسناک", s:22, c:"PS4"},
+{n:"Resident Evil 4 (2023 video game)", g:"ترسناک", s:30, c:"PS4"},
+{n:"Resident Evil 4", g:"ترسناک", s:30, c:"PS4"},
+{n:"Resident Evil 5", g:"ترسناک", s:16, c:"PS4"},
+{n:"Resident Evil 6", g:"ترسناک", s:17, c:"PS4"},
+{n:"Resident Evil 7: Biohazard", g:"ترسناک", s:30, c:"PS4"},
+{n:"Resident Evil: Revelations", g:"ترسناک", c:"PS4"},
+{n:"Resident Evil: Revelations 2", g:"ترسناک", c:"PS4"},
+{n:"Resident Evil Village", g:"ترسناک", s:35, c:"PS4"},
+{n:"RIDE 4", g:"ریسینگ", s:25, c:"PS4"},
+{n:"Rise of the Tomb Raider", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Rocket League", g:"ورزشی", c:"PS4"},
+{n:"Sackboy: A Big Adventure", g:"پلتفرمر", s:33, c:"PS4"},
+{n:"Saints Row (2022 video game)", g:"جهان باز", c:"PS4"},
+{n:"Sekiro: Shadows Die Twice", g:"نقش‌آفرینی", s:12, c:"PS4"},
+{n:"Shadow of the Tomb Raider", g:"اکشن ماجراجویی", s:31, c:"PS4"},
+{n:"SIFU", g:"اکشن ماجراجویی", s:8, c:"PS4"},
+{n:"Sniper Elite 4", g:"شوتینگ", c:"PS4"},
+{n:"Sniper Elite 5", g:"شوتینگ", s:30, c:"PS4"},
+{n:"Sniper Ghost Warrior 3", g:"شوتینگ", c:"PS4"},
+{n:"Sniper Ghost Warrior Contracts", g:"شوتینگ", c:"PS4"},
+{n:"Sniper Ghost Warrior Contracts 2", g:"شوتینگ", c:"PS4"},
+{n:"Sonic Colors: Ultimate", g:"پلتفرمر", c:"PS4"},
+{n:"Sonic Forces", g:"پلتفرمر", c:"PS4"},
+{n:"Sonic Frontiers", g:"پلتفرمر", c:"PS4"},
+{n:"Spirit of the North", g:"ایندی", c:"PS4"},
+{n:"SpongeBob SquarePants: Battle for Bikini Bottom – Rehydrated", g:"پلتفرمر", c:"PS4"},
+{n:"Star Wars Jedi: Fallen Order", g:"اکشن ماجراجویی", s:45, c:"PS4"},
+{n:"Stray (video game)", g:"ایندی", s:7, c:"PS4"},
+{n:"Street Fighter 6", g:"مبارزه‌ای", s:36, c:"PS4"},
+{n:"Streets of Rage 4", g:"مبارزه‌ای", c:"PS4"},
+{n:"Team Sonic Racing", g:"ریسینگ", c:"PS4"},
+{n:"Teenage Mutant Ninja Turtles: Shredder's Revenge", g:"مبارزه‌ای", c:"PS4"},
+{n:"Tekken 7", g:"مبارزه‌ای", s:51, c:"PS4"},
+{n:"The Callisto Protocol", g:"ترسناک", s:54, c:"PS4"},
+{n:"The Last of Us Part II", g:"اکشن ماجراجویی", s:92, c:"PS4"},
+{n:"The Last of Us Remastered", g:"اکشن ماجراجویی", s:41, c:"PS4"},
+{n:"The Lord of the Rings: Gollum", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"The Order: 1886", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"The Walking Dead: Destinies", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"The Witcher 3: Wild Hunt", g:"نقش‌آفرینی", s:40, c:"PS4"},
+{n:"Tom Clancy's Ghost Recon Wildlands", g:"جهان باز", c:"PS4"},
+{n:"Uncharted 4: A Thief's End", g:"اکشن ماجراجویی", s:44, c:"PS4"},
+{n:"Uncharted: The Lost Legacy", g:"اکشن ماجراجویی", s:43, c:"PS4"},
+{n:"Uncharted: The Nathan Drake Collection", g:"اکشن ماجراجویی", c:"PS4"},
+{n:"Unravel Two", g:"پلتفرمر", s:3, c:"PS4"},
+{n:"Unravel (video game)", g:"پلتفرمر", c:"PS4"},
+{n:"Watch Dogs (video game)", g:"جهان باز", c:"PS4"},
+{n:"Watch Dogs 2", g:"جهان باز", c:"PS4"},
+{n:"Watch Dogs: Legion", g:"جهان باز", s:47, c:"PS4"},
+{n:"World War Z (video game)", g:"شوتینگ", c:"PS4"},
+{n:"WRC 10", g:"ریسینگ", c:"PS4"},
+{n:"WWE 2K23", g:"ورزشی", s:60, c:"PS4"},
+{n:"WWE 2K24", g:"ورزشی", s:75, c:"PS4"},
+{n:"WWE 2K25", g:"ورزشی", s:90, c:"PS4", isNew:true},
+
+{n:"Sackboy: A Big Adventure", g:"پلتفرمر", s:33, c:"PS5"},
+{n:"Ratchet & Clank: Rift Apart", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"DIRT 5", g:"ریسینگ", s:25, c:"PS5"},
+{n:"Resident Evil Village", g:"ترسناک", s:35, c:"PS5"},
+{n:"Need for Speed Unbound", g:"ریسینگ", c:"PS5"},
+{n:"Kena: Bridge of Spirits", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"LEGO Star Wars: The Skywalker Saga", g:"پلتفرمر", s:32, c:"PS5"},
+{n:"Ghost of Tsushima", g:"جهان باز", s:35, c:"PS5"},
+{n:"A Plague Tale: Innocence", g:"اکشن ماجراجویی", s:35, c:"PS5"},
+{n:"Pragmata", g:"شوتینگ", c:"PS5", isNew:true},
+{n:"Dead Island 2", g:"ترسناک", s:18, c:"PS5"},
+{n:"The Last of Us Part I", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"Resident Evil 3", g:"ترسناک", s:22, c:"PS5"},
+{n:"Cyberpunk 2077", g:"جهان باز", s:114, c:"PS5"},
+{n:"LEGO 2K Drive", g:"ریسینگ", s:14, c:"PS5"},
+{n:"Grand Theft Auto V", g:"جهان باز", s:78, c:"PS5"},
+{n:"Resident Evil 7: Biohazard", g:"ترسناک", s:30, c:"PS5"},
+{n:"Gear.Club Unlimited 2", g:"ریسینگ", c:"PS5"},
+{n:"RoboCop: Rogue City", g:"شوتینگ", c:"PS5"},
+{n:"Little Nightmares III", g:"ترسناک", s:21, c:"PS5"},
+{n:"A Plague Tale: Requiem", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"Lords of the Fallen", g:"نقش‌آفرینی", s:6, c:"PS5"},
+{n:"Assassin's Creed Mirage", g:"جهان باز", s:40, c:"PS5"},
+{n:"Resident Evil 4", g:"ترسناک", s:30, c:"PS5"},
+{n:"Mortal Kombat 1", g:"مبارزه‌ای", c:"PS5"},
+{n:"SAROS", g:"شوتینگ", c:"PS5", isNew:true},
+{n:"God of War Ragnarök", g:"اکشن ماجراجویی", s:113, c:"PS5"},
+{n:"Split Fiction", g:"اکشن ماجراجویی", c:"PS5", isNew:true},
+{n:"Silent Hill 2", g:"ترسناک", c:"PS5"},
+{n:"Sonic Racing CrossWorlds", g:"ریسینگ", s:25, c:"PS5", isNew:true},
+{n:"Hell Is Us", g:"اکشن ماجراجویی", c:"PS5", isNew:true},
+{n:"WUCHANG: Fallen Feathers", g:"نقش‌آفرینی", c:"PS5", isNew:true},
+{n:"Dragon's Dogma 2", g:"نقش‌آفرینی", c:"PS5"},
+{n:"Ghostrunner 2", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"Lies of P", g:"نقش‌آفرینی", s:28, c:"PS5"},
+{n:"Tekken 8", g:"مبارزه‌ای", c:"PS5"},
+{n:"The Last of Us Part II Remastered", g:"اکشن ماجراجویی", s:92, c:"PS5"},
+{n:"LEGO Horizon Adventures", g:"پلتفرمر", c:"PS5"},
+{n:"RIDE 5", g:"ریسینگ", c:"PS5"},
+{n:"Hot Wheels Unleashed 2", g:"ریسینگ", s:22, c:"PS5"},
+{n:"Until Dawn", g:"ترسناک", s:36, c:"PS5"},
+{n:"Skull Island: Rise of Kong", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"Horizon Forbidden West Complete Edition", g:"جهان باز", s:89, c:"PS5"},
+{n:"MotoGP 24", g:"ریسینگ", c:"PS5"},
+{n:"EA Sports FC 25", g:"ورزشی", s:43, c:"PS5"},
+{n:"Assassin's Creed Shadows", g:"جهان باز", c:"PS5", isNew:true},
+{n:"The First Berserker: Khazan", g:"نقش‌آفرینی", c:"PS5", isNew:true},
+{n:"Poppy Playtime Chapter 1", g:"ترسناک", c:"PS5"},
+{n:"Silent Hill f", g:"ترسناک", c:"PS5", isNew:true},
+{n:"Astro Bot", g:"پلتفرمر", c:"PS5"},
+{n:"Poppy Playtime Chapter 2", g:"ترسناک", c:"PS5"},
+{n:"Forza Horizon 5", g:"ریسینگ", c:"PS5"},
+{n:"Black Myth: Wukong", g:"نقش‌آفرینی", c:"PS5"},
+{n:"REANIMAL", g:"ترسناک", c:"PS5", isNew:true},
+{n:"Crimson Desert", g:"جهان باز", c:"PS5", isNew:true},
+{n:"Elden Ring Nightreign", g:"نقش‌آفرینی", s:19, c:"PS5", isNew:true},
+{n:"Ghost of Yōtei", g:"جهان باز", c:"PS5", isNew:true},
+{n:"Ninja Gaiden 2 Black", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"Indiana Jones and the Great Circle", g:"اکشن ماجراجویی", c:"PS5"},
+{n:"EA Sports FC 26", g:"ورزشی", s:76, c:"PS5", isNew:true},
+{n:"Days Gone Remastered", g:"جهان باز", c:"PS5"},
+{n:"Resident Evil Requiem", g:"ترسناک", c:"PS5", isNew:true},
+];
+
+// known Aparat video hashes for trailers. games not listed here
+// get a link to an Aparat search instead of a direct video.
+const trailers = {
+  "God of War Ragnarök": "vB9Gb",
+  "Elden Ring": "KOr9z",
+  "Marvel's Spider-Man: Miles Morales": "dfh4ie7",
+  "Grand Theft Auto V": "YMdJv",
+  "Red Dead Redemption 2": "W4rKk",
+  "Cyberpunk 2077": "xEy75",
+  "Horizon Forbidden West": "t1q6E",
+  "The Last of Us Part II": "czFrn",
+  "Resident Evil Village": "PYBk5",
+  "Hogwarts Legacy": "LApYi",
+  "Ghost of Tsushima": "xblnx05",
+  "Mortal Kombat 11": "m2172q4",
+  "Assassin's Creed Valhalla": "GeU57",
+  "Tekken 7": "a08p19f",
+  "Street Fighter 6": "aSKTf",
+  "Uncharted 4: A Thief's End": "y2Y9L",
+  "Death Stranding": "3TL8g",
+  "Days Gone": "VidnE",
+  "Detroit: Become Human": "slth1p9",
+  "The Witcher 3: Wild Hunt": "TdGez",
+  "It Takes Two": "60Jaf"
+};
+
+const grid = document.getElementById('grid');
+const emptyMsg = document.getElementById('empty');
+const searchInput = document.getElementById('search');
+const chipsWrap = document.getElementById('chips');
+document.getElementById('count').textContent = games.length + ' بازی';
+
+let activeGenre = 'همه';
+let activeSort = 'default';
+let activeConsole = 'PS4';
+let displayGames = games.slice();
+
+document.querySelectorAll('#platformRow .platform-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeConsole = chip.dataset.platform.toUpperCase();
+    document.querySelectorAll('#platformRow .platform-chip').forEach(c => c.classList.toggle('active', c === chip));
+    applyFilters();
+    buildPopularStrip();
+    buildAlphaNav();
+  });
+});
+
+const genres = ['همه', ...Array.from(new Set(games.map(g => g.g)))];
+genres.forEach(genre => {
+  const chip = document.createElement('div');
+  chip.className = 'chip' + (genre === 'همه' ? ' active' : '');
+  chip.textContent = genre;
+  chip.dataset.genre = genre;
+  chip.addEventListener('click', () => {
+    activeGenre = genre;
+    document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('active', c.dataset.genre === genre));
+    applyFilters();
+  });
+  chipsWrap.appendChild(chip);
+});
+
+document.querySelectorAll('#sortRow .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeSort = chip.dataset.sort;
+    document.querySelectorAll('#sortRow .chip').forEach(c => c.classList.toggle('active', c === chip));
+    rebuildGrid();
+  });
+});
+
+const placeholderSVG = `<svg viewBox="0 0 24 24" fill="#5a5f6a" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.5 7h-11C4.6 7 3 8.6 3 10.5v4C3 16.4 4.6 18 6.5 18c1 0 1.9-.4 2.5-1.2l1-1.3c.3-.4.8-.7 1.3-.7h1.4c.5 0 1 .3 1.3.7l1 1.3c.6.8 1.5 1.2 2.5 1.2 1.9 0 3.5-1.6 3.5-3.5v-4C21 8.6 19.4 7 17.5 7zM9 12H7.5v1.5H6V12H4.5v-1.5H6V9h1.5v1.5H9V12zm5.5 1.2c-.6 0-1.2-.5-1.2-1.2s.5-1.2 1.2-1.2 1.2.5 1.2 1.2-.5 1.2-1.2 1.2zm2.5-2.5c-.6 0-1.2-.5-1.2-1.2S16.4 8.3 17 8.3s1.2.5 1.2 1.2-.5 1.2-1.2 1.2z"/>
+</svg>`;
+
+function slug(name){
+  return name.replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase();
+}
+
+function makeCard(game){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = 'g-' + game.c.toLowerCase() + '-' + slug(game.n);
+  card.dataset.name = game.n.toLowerCase();
+  card.dataset.genre = game.g;
+  card.dataset.console = game.c;
+
+  const coverWrap = document.createElement('div');
+  coverWrap.className = 'cover-wrap';
+  coverWrap.innerHTML = placeholderSVG;
+  if(game.isNew){
+    const badge = document.createElement('div');
+    badge.className = 'new-badge';
+    badge.textContent = 'جدید';
+    coverWrap.appendChild(badge);
+  }
+
+  const cleanName = game.n.replace(/\s*\(.*?\)\s*/g,'');
+  const hash = trailers[game.n];
+
+  const title = document.createElement('div');
+  title.className = 'title';
+  title.innerHTML = hash ? `${cleanName} <span class="tick">✅</span>` : cleanName;
+
+  const genreTag = document.createElement('div');
+  genreTag.className = 'genre-tag';
+  genreTag.textContent = game.g;
+
+  if(game.s){ sizeByName[game.n] = game.s; }
+  let sizeTag = null;
+  if(game.s){
+    sizeTag = document.createElement('div');
+    sizeTag.className = 'size-tag';
+    sizeTag.textContent = '💾 ' + game.s + ' GB';
+  }
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-btn';
+  addBtn.textContent = selected.has(game.n) ? '✓ اضافه شد' : '+ افزودن به لیست';
+  if(selected.has(game.n)) addBtn.classList.add('selected');
+  addBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSelect(game.n, addBtn);
+  });
+  btnByName[game.n] = addBtn;
+
+  const trailerLink = document.createElement('a');
+  trailerLink.className = 'trailer-btn';
+  trailerLink.textContent = '▶ تریلر';
+  trailerLink.target = '_blank';
+  trailerLink.rel = 'noopener';
+  trailerLink.href = hash
+    ? `https://www.aparat.com/v/${hash}`
+    : `https://www.aparat.com/result/${encodeURIComponent(cleanName + ' تریلر')}`;
+  trailerLink.addEventListener('click', (e) => e.stopPropagation());
+
+  card.appendChild(coverWrap);
+  card.appendChild(title);
+  card.appendChild(genreTag);
+  if(sizeTag) card.appendChild(sizeTag);
+  card.appendChild(addBtn);
+  card.appendChild(trailerLink);
+  grid.appendChild(card);
+  coverMap[game.c + '|' + game.n] = { wrap: coverWrap, name: game.n };
+  return coverWrap;
+}
+
+// ---- selection cart ----
+const SMS_NUMBER = '0910340487';
+const selected = new Set();
+const btnByName = {};
+const coverMap = {};
+const sizeByName = {};
+
+function toggleSelect(name, btn){
+  if(selected.has(name)){
+    selected.delete(name);
+    btn.classList.remove('selected');
+    btn.textContent = '+ افزودن به لیست';
+  }else{
+    selected.add(name);
+    btn.classList.add('selected');
+    btn.textContent = '✓ اضافه شد';
+  }
+  updateCartBar();
+}
+
+const cartBar = document.getElementById('cartBar');
+const cartCount = document.getElementById('cartCount');
+const overlay = document.getElementById('overlay');
+const selectedList = document.getElementById('selectedList');
+const fullNameInput = document.getElementById('fullName');
+const nameError = document.getElementById('nameError');
+const totalSizeLine = document.getElementById('totalSizeLine');
+const sendBtn = document.getElementById('sendModal');
+const copyBtn = document.getElementById('copyModal');
+const copyToast = document.getElementById('copyToast');
+
+function computeTotalSize(){
+  let total = 0;
+  let unknownCount = 0;
+  selected.forEach(name => {
+    if(sizeByName[name] !== undefined) total += sizeByName[name];
+    else unknownCount++;
+  });
+  return { total, unknownCount };
+}
+
+function updateCartBar(){
+  if(selected.size > 0){
+    cartBar.classList.add('show');
+    const { total, unknownCount } = computeTotalSize();
+    let text = selected.size + ' بازی انتخاب شده';
+    if(total > 0) text += ' • ' + total.toFixed(1).replace(/\.0$/,'') + ' GB';
+    if(unknownCount > 0) text += ' (+' + unknownCount + ' نامشخص)';
+    cartCount.textContent = text;
+  }else{
+    cartBar.classList.remove('show');
+  }
+}
+
+function renderSelectedList(){
+  selectedList.innerHTML = '';
+  selected.forEach(name => {
+    const li = document.createElement('li');
+    const span = document.createElement('span');
+    const size = sizeByName[name];
+    span.textContent = name.replace(/\s*\(.*?\)\s*/g,'') + (size ? ' — ' + size + ' GB' : '');
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', () => {
+      selected.delete(name);
+      const btn = btnByName[name];
+      if(btn){ btn.classList.remove('selected'); btn.textContent = '+ افزودن به لیست'; }
+      renderSelectedList();
+      updateCartBar();
+      if(selected.size === 0) overlay.classList.remove('show');
+    });
+    li.appendChild(span);
+    li.appendChild(removeBtn);
+    selectedList.appendChild(li);
+  });
+  const { total, unknownCount } = computeTotalSize();
+  totalSizeLine.textContent = selected.size > 0
+    ? 'حجم کل: ' + (total > 0 ? total.toFixed(1).replace(/\.0$/,'') + ' GB' : 'نامشخص') + (unknownCount > 0 ? ' (+' + unknownCount + ' بازی حجم نامشخص)' : '')
+    : '';
+}
+
+function clearAllSelections(){
+  selected.forEach(name => {
+    const btn = btnByName[name];
+    if(btn){ btn.classList.remove('selected'); btn.textContent = '+ افزودن به لیست'; }
+  });
+  selected.clear();
+  updateCartBar();
+  overlay.classList.remove('show');
+}
+document.getElementById('clearCartBtn').addEventListener('click', clearAllSelections);
+
+document.getElementById('cartBtn').addEventListener('click', () => {
+  renderSelectedList();
+  nameError.textContent = '';
+  overlay.classList.add('show');
+});
+
+document.getElementById('closeModal').addEventListener('click', () => {
+  overlay.classList.remove('show');
+});
+
+overlay.addEventListener('click', (e) => {
+  if(e.target === overlay) overlay.classList.remove('show');
+});
+
+function validateName(){
+  const name = fullNameInput.value.trim();
+  if(name.length < 3){
+    nameError.textContent = 'لطفاً نام و نام خانوادگی رو کامل وارد کنید.';
+    fullNameInput.style.borderColor = 'var(--danger)';
+    return null;
+  }
+  if(/\d/.test(name)){
+    nameError.textContent = 'نام نباید شامل عدد باشه.';
+    fullNameInput.style.borderColor = 'var(--danger)';
+    return null;
+  }
+  nameError.textContent = '';
+  fullNameInput.style.borderColor = 'var(--border)';
+  return name;
+}
+
+function buildMessage(name){
+  const gameLines = Array.from(selected)
+    .map(n => n.replace(/\s*\(.*?\)\s*/g,''))
+    .join('\n');
+  const { total, unknownCount } = computeTotalSize();
+  let sizeLine = '';
+  if(total > 0){
+    sizeLine = `\n\nحجم کل: ${total.toFixed(1).replace(/\.0$/,'')} GB`;
+    if(unknownCount > 0) sizeLine += ` (+${unknownCount} بازی حجم نامشخص)`;
+  }
+  return `مشخصات مشتری: ${name}\n\nبازی‌های درخواستی:\n${gameLines}${sizeLine}`;
+}
+
+sendBtn.addEventListener('click', () => {
+  const name = validateName();
+  if(!name || selected.size === 0) return;
+  const body = buildMessage(name);
+  window.location.href = `sms:${SMS_NUMBER}?body=${encodeURIComponent(body)}`;
+});
+
+copyBtn.addEventListener('click', async () => {
+  const name = validateName();
+  if(!name || selected.size === 0) return;
+  const body = buildMessage(name);
+  try{
+    await navigator.clipboard.writeText(body);
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = body;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  copyToast.classList.add('show');
+  setTimeout(() => copyToast.classList.remove('show'), 2000);
+});
+
+// ---- render / filter / sort ----
+function rebuildGrid(){
+  grid.innerHTML = '';
+  let list = games.slice();
+  if(activeSort === 'alpha'){
+    list.sort((a,b) => a.n.localeCompare(b.n));
+  }
+  list.forEach(g => makeCard(g));
+  attachObservers();
+  applyFilters();
+}
+
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+  document.querySelectorAll('.card').forEach(card => {
+    const matchName = card.dataset.name.includes(q);
+    const matchGenre = activeGenre === 'همه' || card.dataset.genre === activeGenre;
+    const matchConsole = card.dataset.console === activeConsole;
+    const show = matchName && matchGenre && matchConsole;
+    card.style.display = show ? '' : 'none';
+    if(show) visibleCount++;
+  });
+  emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+  document.getElementById('count').textContent = visibleCount + ' بازی';
+}
+searchInput.addEventListener('input', applyFilters);
+
+// ---- cover loading (lazy + cached) ----
+const CACHE_KEY = 'ps4_cover_cache_v1';
+let coverCache = {};
+try{ coverCache = JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; }catch(e){ coverCache = {}; }
+
+async function fetchCover(name){
+  if(coverCache[name] !== undefined) return coverCache[name];
+  const query = encodeURIComponent(name);
+  const url = `https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=search&gsrsearch=${query}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=300&format=json`;
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+    const pages = data.query && data.query.pages;
+    const page = pages ? Object.values(pages)[0] : null;
+    const src = page && page.thumbnail ? page.thumbnail.source : null;
+    coverCache[name] = src;
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(coverCache)); }catch(e){}
+    return src;
+  }catch(e){
+    return null;
+  }
+}
+
+async function loadOne(name, wrapEl){
+  if(wrapEl.dataset.loaded) return;
+  wrapEl.dataset.loaded = '1';
+  const src = await fetchCover(name);
+  if(src){
+    const img = document.createElement('img');
+    img.src = src;
+    img.onerror = () => { wrapEl.dataset.loaded = ''; };
+    const badge = wrapEl.querySelector('.new-badge');
+    wrapEl.innerHTML = '';
+    wrapEl.appendChild(img);
+    if(badge) wrapEl.appendChild(badge);
+  }
+}
+
+let observer;
+function attachObservers(){
+  if(observer) observer.disconnect();
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const name = entry.target.dataset.name2;
+        loadOne(name, entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '400px 0px' });
+
+  Object.keys(coverMap).forEach(name => {
+    const el = coverMap[name];
+    el.dataset.name2 = name;
+    observer.observe(el);
+  });
+}
+
+// ---- popular strip ----
+const popularStrip = document.getElementById('popularStrip');
+function buildPopularStrip(){
+  popularStrip.innerHTML = '';
+  Object.keys(trailers).forEach(name => {
+    const game = games.find(g => g.n === name && g.c === activeConsole);
+    if(!game) return;
+    const cleanName = name.replace(/\s*\(.*?\)\s*/g,'');
+    const pc = document.createElement('div');
+    pc.className = 'pop-card';
+    const pcCover = document.createElement('div');
+    pcCover.className = 'pop-cover';
+    pcCover.innerHTML = placeholderSVG;
+    const pcTitle = document.createElement('div');
+    pcTitle.className = 'pop-title';
+    pcTitle.textContent = cleanName;
+    pc.appendChild(pcCover);
+    pc.appendChild(pcTitle);
+    pc.addEventListener('click', () => {
+      const target = document.getElementById('g-' + game.c.toLowerCase() + '-' + slug(name));
+      if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+    popularStrip.appendChild(pc);
+
+    // reuse the same cover cache/fetch for the popular strip thumbnail
+    fetchCover(name).then(src => {
+      if(src){
+        const img = document.createElement('img');
+        img.src = src;
+        pcCover.innerHTML = '';
+        pcCover.appendChild(img);
+      }
+    });
+  });
+}
+buildPopularStrip();
+
+// ---- alphabet jump nav ----
+const alphaNav = document.getElementById('alphaNav');
+function buildAlphaNav(){
+  alphaNav.innerHTML = '';
+  const consoleGames = games.filter(g => g.c === activeConsole);
+  const letters = Array.from(new Set(consoleGames.map(g => g.n[0].toUpperCase()))).sort();
+  letters.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.textContent = letter;
+    btn.addEventListener('click', () => {
+      const match = consoleGames
+        .slice()
+        .sort((a,b) => a.n.localeCompare(b.n))
+        .find(g => g.n[0].toUpperCase() === letter);
+      if(match){
+        const target = document.getElementById('g-' + match.c.toLowerCase() + '-' + slug(match.n));
+        if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    });
+    alphaNav.appendChild(btn);
+  });
+}
+buildAlphaNav();
+
+// ---- scroll to top ----
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 600);
+});
+topBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+// ---- initial build ----
+rebuildGrid();
+
+// ---- theme toggle (dark/light) ----
+const themeToggle = document.getElementById('themeToggle');
+const THEME_KEY = 'ps4_theme';
+
+function applyTheme(theme){
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if(theme === 'light'){
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeToggle.textContent = '☀️';
+    if(metaTheme) metaTheme.setAttribute('content', '#f3f4f6');
+  }else{
+    document.documentElement.removeAttribute('data-theme');
+    themeToggle.textContent = '🌙';
+    if(metaTheme) metaTheme.setAttribute('content', '#0f1115');
+  }
+}
+
+let savedTheme = 'dark';
+try{ savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; }catch(e){}
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+});
+</script>
+</body>
+</html>
