@@ -10,6 +10,10 @@
 <meta name="apple-mobile-web-app-title" content="بازی‌های PS4">
 <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi2YTbjNiz2Kog2KjYp9iy24zigIzZh9inLNzZgSBQUzQiLCJzaG9ydF9uYW1lIjoiUFM0IEdhbWVzIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjExMTUiLCJ0aGVtZV9jb2xvciI6IiMwZjExMTUifQ==">
 <title>Persian Store</title>
+<link rel="preconnect" href="https://en.wikipedia.org">
+<link rel="dns-prefetch" href="https://en.wikipedia.org">
+<link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
+<link rel="dns-prefetch" href="https://upload.wikimedia.org">
 <style>
   :root{
     --bg:#0f1115;
@@ -126,6 +130,12 @@
     border-color:var(--accent);
     color:#fff;
   }
+  #priceNote{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
 
   /* popular strip */
   #popularWrap{
@@ -200,6 +210,15 @@
     justify-content:center;
     overflow:hidden;
     position:relative;
+  }
+  .cover-wrap.skeleton{
+    background:linear-gradient(100deg, var(--surface1) 30%, var(--border) 50%, var(--surface1) 70%);
+    background-size:200% 100%;
+    animation:shimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position:200% 0; }
+    100%{ background-position:-200% 0; }
   }
   .cover-wrap img{
     width:100%;
@@ -292,6 +311,10 @@
     opacity:.7;
     font-size:10px;
     letter-spacing:.2px;
+  }
+  footer .updated-line{
+    font-size:10.5px;
+    opacity:.8;
   }
 
   /* alphabet jump nav */
@@ -438,6 +461,28 @@
     color:var(--muted);
     margin:-8px 0 14px;
   }
+  #spaceCheckWrap{
+    background:var(--surface1);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:14px;
+  }
+  #spaceCheckWrap label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  #freeSpace{
+    margin-bottom:0;
+  }
+  #spaceCheckResult{
+    font-size:12px;
+    margin-top:6px;
+    text-align:center;
+  }
+  #spaceCheckResult.ok{ color:var(--green); }
+  #spaceCheckResult.bad{ color:var(--danger); }
   #selectedList li{
     display:flex;
     justify-content:space-between;
@@ -529,6 +574,7 @@
     <div class="chip platform-chip active" data-platform="ps4">PS4</div>
     <div class="chip platform-chip" data-platform="ps5">PS5</div>
   </div>
+  <div id="priceNote">💰 قیمت نصب هر بازی: PS4 = ۱۵۰,۰۰۰ تومان &nbsp;|&nbsp; PS5 = ۴۵۰,۰۰۰ تومان</div>
   <div id="chips"></div>
   <div id="sortRow">
     <div class="chip active" data-sort="default">پیش‌فرض</div>
@@ -544,7 +590,10 @@
 <div id="grid"></div>
 <div id="empty">بازی‌ای با این مشخصات پیدا نشد.</div>
 
-<footer><span class="credit">طراحی سایت: طاها صوفی</span></footer>
+<footer>
+  <div class="updated-line">آخرین به‌روزرسانی لیست: ۱۴۰۵/۰۶/۲۳</div>
+  <span class="credit">طراحی سایت: طاها صوفی</span>
+</footer>
 
 <div id="alphaNav"></div>
 <button id="topBtn">↑</button>
@@ -564,6 +613,11 @@
     <div id="nameError"></div>
     <ul id="selectedList"></ul>
     <div id="totalSizeLine"></div>
+    <div id="spaceCheckWrap">
+      <label for="freeSpace">فضای خالی کنسولت چقدره؟ (GB)</label>
+      <input id="freeSpace" type="number" min="0" placeholder="مثلاً 250">
+      <div id="spaceCheckResult"></div>
+    </div>
     <div class="modal-actions">
       <button id="closeModal">بستن</button>
       <button id="copyModal">کپی متن</button>
@@ -921,7 +975,7 @@ function makeCard(game){
   card.dataset.console = game.c;
 
   const coverWrap = document.createElement('div');
-  coverWrap.className = 'cover-wrap';
+  coverWrap.className = 'cover-wrap skeleton';
   coverWrap.innerHTML = placeholderSVG;
   if(game.isNew){
     const badge = document.createElement('div');
@@ -955,7 +1009,7 @@ function makeCard(game){
   if(selected.has(game.n)) addBtn.classList.add('selected');
   addBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    toggleSelect(game.n, addBtn);
+    toggleSelect(game.n, addBtn, game.c);
   });
   btnByName[game.n] = addBtn;
 
@@ -981,19 +1035,28 @@ function makeCard(game){
 }
 
 // ---- selection cart ----
+// ⚠️ قیمت نصب هر بازی، بر اساس کنسول (ثابت، مستقل از حجم)
+const PRICE_PS4 = 150000;
+const PRICE_PS5 = 450000;
+function priceFor(consoleName){
+  return consoleName === 'PS5' ? PRICE_PS5 : PRICE_PS4;
+}
+
 const SMS_NUMBER = '0910340487';
 const selected = new Set();
 const btnByName = {};
 const coverMap = {};
 const sizeByName = {};
+const consoleByName = {};
 
-function toggleSelect(name, btn){
+function toggleSelect(name, btn, consoleName){
   if(selected.has(name)){
     selected.delete(name);
     btn.classList.remove('selected');
     btn.textContent = '+ افزودن به لیست';
   }else{
     selected.add(name);
+    consoleByName[name] = consoleName;
     btn.classList.add('selected');
     btn.textContent = '✓ اضافه شد';
   }
@@ -1014,19 +1077,22 @@ const copyToast = document.getElementById('copyToast');
 function computeTotalSize(){
   let total = 0;
   let unknownCount = 0;
+  let price = 0;
   selected.forEach(name => {
     if(sizeByName[name] !== undefined) total += sizeByName[name];
     else unknownCount++;
+    price += priceFor(consoleByName[name]);
   });
-  return { total, unknownCount };
+  return { total, unknownCount, price };
 }
 
 function updateCartBar(){
   if(selected.size > 0){
     cartBar.classList.add('show');
-    const { total, unknownCount } = computeTotalSize();
+    const { total, unknownCount, price } = computeTotalSize();
     let text = selected.size + ' بازی انتخاب شده';
     if(total > 0) text += ' • ' + total.toFixed(1).replace(/\.0$/,'') + ' GB';
+    if(price > 0) text += ' • ' + price.toLocaleString('fa-IR') + ' تومان';
     if(unknownCount > 0) text += ' (+' + unknownCount + ' نامشخص)';
     cartCount.textContent = text;
   }else{
@@ -1034,13 +1100,41 @@ function updateCartBar(){
   }
 }
 
+const freeSpaceInput = document.getElementById('freeSpace');
+const spaceCheckResult = document.getElementById('spaceCheckResult');
+
+function updateSpaceCheck(){
+  const free = parseFloat(freeSpaceInput.value);
+  spaceCheckResult.className = '';
+  if(!free || free <= 0){
+    spaceCheckResult.textContent = '';
+    return;
+  }
+  const { total } = computeTotalSize();
+  if(total === 0){
+    spaceCheckResult.textContent = '';
+    return;
+  }
+  const remaining = free - total;
+  if(remaining >= 0){
+    spaceCheckResult.textContent = `✅ جا میشه — ${remaining.toFixed(1).replace(/\.0$/,'')} GB فضای خالی باقی می‌مونه`;
+    spaceCheckResult.classList.add('ok');
+  }else{
+    spaceCheckResult.textContent = `⚠️ کافی نیست — ${Math.abs(remaining).toFixed(1).replace(/\.0$/,'')} GB بیشتر از فضای موجود لازمه`;
+    spaceCheckResult.classList.add('bad');
+  }
+}
+freeSpaceInput.addEventListener('input', updateSpaceCheck);
+
 function renderSelectedList(){
   selectedList.innerHTML = '';
   selected.forEach(name => {
     const li = document.createElement('li');
     const span = document.createElement('span');
     const size = sizeByName[name];
-    span.textContent = name.replace(/\s*\(.*?\)\s*/g,'') + (size ? ' — ' + size + ' GB' : '');
+    const gamePrice = priceFor(consoleByName[name]);
+    const sizeStr = size ? ' — ' + size + ' GB' : '';
+    span.textContent = name.replace(/\s*\(.*?\)\s*/g,'') + sizeStr + ' — ' + gamePrice.toLocaleString('fa-IR') + ' تومان';
     const removeBtn = document.createElement('button');
     removeBtn.textContent = '✕';
     removeBtn.addEventListener('click', () => {
@@ -1055,10 +1149,13 @@ function renderSelectedList(){
     li.appendChild(removeBtn);
     selectedList.appendChild(li);
   });
-  const { total, unknownCount } = computeTotalSize();
+  const { total, unknownCount, price } = computeTotalSize();
   totalSizeLine.textContent = selected.size > 0
-    ? 'حجم کل: ' + (total > 0 ? total.toFixed(1).replace(/\.0$/,'') + ' GB' : 'نامشخص') + (unknownCount > 0 ? ' (+' + unknownCount + ' بازی حجم نامشخص)' : '')
+    ? 'حجم کل: ' + (total > 0 ? total.toFixed(1).replace(/\.0$/,'') + ' GB' : 'نامشخص')
+      + (price > 0 ? '  •  قیمت کل: ' + price.toLocaleString('fa-IR') + ' تومان' : '')
+      + (unknownCount > 0 ? ' (+' + unknownCount + ' بازی حجم نامشخص)' : '')
     : '';
+  updateSpaceCheck();
 }
 
 function clearAllSelections(){
@@ -1107,10 +1204,11 @@ function buildMessage(name){
   const gameLines = Array.from(selected)
     .map(n => n.replace(/\s*\(.*?\)\s*/g,''))
     .join('\n');
-  const { total, unknownCount } = computeTotalSize();
+  const { total, unknownCount, price } = computeTotalSize();
   let sizeLine = '';
   if(total > 0){
     sizeLine = `\n\nحجم کل: ${total.toFixed(1).replace(/\.0$/,'')} GB`;
+    if(price > 0) sizeLine += ` — قیمت کل: ${price.toLocaleString('fa-IR')} تومان`;
     if(unknownCount > 0) sizeLine += ` (+${unknownCount} بازی حجم نامشخص)`;
   }
   return `مشخصات مشتری: ${name}\n\nبازی‌های درخواستی:\n${gameLines}${sizeLine}`;
@@ -1177,9 +1275,26 @@ try{ coverCache = JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; }catch(e){ 
 async function fetchCover(name){
   if(coverCache[name] !== undefined) return coverCache[name];
   const query = encodeURIComponent(name);
-  const url = `https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=search&gsrsearch=${query}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=300&format=json`;
+
+  // fast path: direct title lookup (skips Wikipedia's full-text search ranking)
   try{
-    const res = await fetch(url);
+    const directUrl = `https://en.wikipedia.org/w/api.php?origin=*&action=query&titles=${query}&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=300&format=json`;
+    const res = await fetch(directUrl);
+    const data = await res.json();
+    const pages = data.query && data.query.pages;
+    const page = pages ? Object.values(pages)[0] : null;
+    const src = page && page.thumbnail ? page.thumbnail.source : null;
+    if(src){
+      coverCache[name] = src;
+      try{ localStorage.setItem(CACHE_KEY, JSON.stringify(coverCache)); }catch(e){}
+      return src;
+    }
+  }catch(e){ /* fall through to search */ }
+
+  // fallback: full-text search (slower, catches titles that don't match exactly)
+  try{
+    const searchUrl = `https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=search&gsrsearch=${query}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=300&format=json`;
+    const res = await fetch(searchUrl);
     const data = await res.json();
     const pages = data.query && data.query.pages;
     const page = pages ? Object.values(pages)[0] : null;
@@ -1196,6 +1311,7 @@ async function loadOne(name, wrapEl){
   if(wrapEl.dataset.loaded) return;
   wrapEl.dataset.loaded = '1';
   const src = await fetchCover(name);
+  wrapEl.classList.remove('skeleton');
   if(src){
     const img = document.createElement('img');
     img.src = src;
@@ -1218,11 +1334,12 @@ function attachObservers(){
         observer.unobserve(entry.target);
       }
     });
-  }, { rootMargin: '400px 0px' });
+  }, { rootMargin: '900px 0px' });
 
-  Object.keys(coverMap).forEach(name => {
-    const el = coverMap[name];
-    el.dataset.name2 = name;
+  Object.keys(coverMap).forEach(key => {
+    const entry = coverMap[key];
+    const el = entry.wrap;
+    el.dataset.name2 = entry.name;
     observer.observe(el);
   });
 }
