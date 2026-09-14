@@ -16,40 +16,51 @@
 <link rel="dns-prefetch" href="https://upload.wikimedia.org">
 <style>
   :root{
-    --bg:#0f1115;
-    --card:#1a1d24;
-    --accent:#3b82f6;
-    --text:#e8e9ec;
-    --muted:#8a8f98;
-    --green:#22c55e;
-    --surface0:#0f1115;
-    --surface1:#22252d;
-    --border:#2a2e37;
-    --header-bg:#12141a;
-    --danger:#ef4444;
-    --shadow:0 2px 6px rgba(0,0,0,.3);
+    --bg:#14101f;
+    --card:#1e1930;
+    --accent:#29d3ee;
+    --accent-ps4:#29d3ee;
+    --accent-ps5:#ff4fa8;
+    --text:#f1eefa;
+    --muted:#9086ab;
+    --green:#37e08a;
+    --surface0:#191527;
+    --surface1:#251f3a;
+    --border:#332c4d;
+    --header-bg:#171228;
+    --danger:#ff5566;
+    --shadow:0 2px 10px rgba(0,0,0,.4);
   }
+  html[data-console="PS5"]{ --accent:#ff4fa8; }
   html[data-theme="light"]{
-    --bg:#e9eaed;
-    --card:#d9dbe0;
-    --accent:#2563eb;
-    --text:#1e2330;
-    --muted:#6b7280;
-    --green:#16a34a;
-    --surface0:#f0f1f3;
-    --surface1:#cfd2d8;
-    --border:#aeb2ba;
-    --header-bg:#e9eaed;
-    --danger:#dc2626;
+    --bg:#e7e6ee;
+    --card:#d7d5e2;
+    --accent:#0891b2;
+    --accent-ps4:#0891b2;
+    --accent-ps5:#c2288a;
+    --text:#211c33;
+    --muted:#635c7d;
+    --green:#0f9d63;
+    --surface0:#eeedf4;
+    --surface1:#cbc9d8;
+    --border:#a9a6bd;
+    --header-bg:#e7e6ee;
+    --danger:#d6294a;
     --shadow:none;
   }
+  html[data-theme="light"][data-console="PS5"]{ --accent:#c2288a; }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
     font-family:'Vazirmatn', Tahoma, Arial, sans-serif;
-    background:var(--bg);
+    background:
+      radial-gradient(600px 300px at 15% 0%, color-mix(in srgb, var(--accent-ps4) 10%, transparent), transparent),
+      radial-gradient(600px 300px at 85% 0%, color-mix(in srgb, var(--accent-ps5) 10%, transparent), transparent),
+      var(--bg);
+    background-attachment:fixed;
     color:var(--text);
+    transition:background-color .2s ease;
   }
   header{
     position:sticky; top:0; z-index:10;
@@ -60,8 +71,20 @@
   }
   header h1{
     margin:0 0 10px;
-    font-size:22px;
+    font-size:23px;
     letter-spacing:.5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  header h1 .dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 10px 2px var(--accent);
+    transition:background-color .2s ease, box-shadow .2s ease;
   }
   header .count{
     color:var(--muted);
@@ -105,7 +128,8 @@
   .chip.active{
     background:var(--accent);
     border-color:var(--accent);
-    color:#fff;
+    color:#0d0d12;
+    box-shadow:0 0 14px -2px var(--accent);
   }
   #sortRow{
     display:flex;
@@ -125,10 +149,25 @@
     font-weight:bold;
     padding:8px 24px;
   }
-  #platformRow .platform-chip.active{
-    background:var(--accent);
-    border-color:var(--accent);
-    color:#fff;
+  #platformRow .platform-chip[data-platform="ps4"]{
+    color:var(--accent-ps4);
+    border-color:color-mix(in srgb, var(--accent-ps4) 40%, var(--border));
+  }
+  #platformRow .platform-chip[data-platform="ps5"]{
+    color:var(--accent-ps5);
+    border-color:color-mix(in srgb, var(--accent-ps5) 40%, var(--border));
+  }
+  #platformRow .platform-chip[data-platform="ps4"].active{
+    background:var(--accent-ps4);
+    border-color:var(--accent-ps4);
+    color:#0d0d12;
+    box-shadow:0 0 16px -2px var(--accent-ps4);
+  }
+  #platformRow .platform-chip[data-platform="ps5"].active{
+    background:var(--accent-ps5);
+    border-color:var(--accent-ps5);
+    color:#0d0d12;
+    box-shadow:0 0 16px -2px var(--accent-ps5);
   }
   #priceNote{
     text-align:center;
@@ -192,12 +231,13 @@
   .card{
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:12px;
+    border-top:2px solid var(--accent);
+    border-radius:14px;
     overflow:hidden;
     display:flex;
     flex-direction:column;
     box-shadow:var(--shadow);
-    transition:transform .15s ease, box-shadow .15s ease;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .2s ease;
     scroll-margin-top:140px;
   }
   .card:active{transform:scale(.97);}
@@ -567,7 +607,7 @@
 <button id="themeToggle" title="تغییر تم">🌙</button>
 
 <header>
-  <h1>🎮 Persian Store</h1>
+  <h1><span class="dot"></span>Persian Store</h1>
   <div class="count" id="count"></div>
   <input id="search" type="text" placeholder="جستجوی نام بازی...">
   <div id="platformRow">
@@ -929,12 +969,14 @@ let displayGames = games.slice();
 document.querySelectorAll('#platformRow .platform-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     activeConsole = chip.dataset.platform.toUpperCase();
+    document.documentElement.setAttribute('data-console', activeConsole);
     document.querySelectorAll('#platformRow .platform-chip').forEach(c => c.classList.toggle('active', c === chip));
     applyFilters();
     buildPopularStrip();
     buildAlphaNav();
   });
 });
+document.documentElement.setAttribute('data-console', activeConsole);
 
 const genres = ['همه', ...Array.from(new Set(games.map(g => g.g)))];
 genres.forEach(genre => {
