@@ -543,14 +543,15 @@
   }
   .modal-actions{
     display:flex;
-    gap:10px;
+    flex-wrap:wrap;
+    gap:8px;
   }
   .modal-actions button{
-    flex:1;
-    padding:12px;
+    flex:1 1 calc(50% - 8px);
+    padding:11px 6px;
     border-radius:8px;
     border:none;
-    font-size:14px;
+    font-size:13px;
     font-family:inherit;
     cursor:pointer;
   }
@@ -561,6 +562,11 @@
   #copyModal{
     background:var(--border);
     color:var(--text);
+  }
+  #receiptModal{
+    background:var(--surface1);
+    border:1px solid var(--green);
+    color:var(--green);
   }
   #sendModal{
     background:var(--accent);
@@ -580,6 +586,103 @@
     z-index:50;
   }
   #copyToast.show{ display:block; }
+
+  /* receipt */
+  #receiptOverlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.7);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:50;
+    padding:6vh 16px;
+    overflow-y:auto;
+  }
+  #receiptOverlay.show{ display:flex; }
+  #receiptCard{
+    position:relative;
+    background:#fdfbf3;
+    color:#2b2b2b;
+    width:100%;
+    max-width:340px;
+    padding:24px 20px 34px;
+    font-family:'Courier New', 'Vazirmatn', monospace;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    border-radius:2px;
+  }
+  #receiptClose{
+    position:absolute;
+    top:8px;
+    left:10px;
+    cursor:pointer;
+    color:#999;
+    font-size:16px;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #receiptCard .r-header{
+    text-align:center;
+    margin-bottom:10px;
+  }
+  #receiptCard .r-logo{
+    font-size:16px;
+    font-weight:bold;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #receiptCard .r-sub{
+    font-size:11px;
+    color:#666;
+    margin-top:2px;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #receiptCard .r-dashed{
+    border-top:1px dashed #9a9a8f;
+    margin:10px 0;
+  }
+  #receiptCard .r-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    padding:2px 0;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #receiptCard .r-row.r-total{
+    font-size:14px;
+    font-weight:bold;
+    margin-top:4px;
+  }
+  #rItems{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  #rItems li{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    padding:3px 0;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #rItems li .r-item-console{
+    font-size:10px;
+    color:#777;
+  }
+  #receiptCard .r-footer{
+    text-align:center;
+    font-size:12px;
+    margin-top:10px;
+    font-family:'Vazirmatn', sans-serif;
+  }
+  #receiptCard .r-zigzag{
+    position:absolute;
+    bottom:-1px; left:0; right:0;
+    height:14px;
+    background:
+      linear-gradient(-45deg, #fdfbf3 8px, transparent 0),
+      linear-gradient(45deg, #fdfbf3 8px, transparent 0);
+    background-size:16px 16px;
+    background-position:left bottom;
+    background-repeat:repeat-x;
+  }
 
   /* theme toggle */
   #themeToggle{
@@ -661,12 +764,35 @@
     <div class="modal-actions">
       <button id="closeModal">بستن</button>
       <button id="copyModal">کپی متن</button>
+      <button id="receiptModal">🧾 رسید</button>
       <button id="sendModal">ارسال پیامک</button>
     </div>
   </div>
 </div>
 
 <div id="copyToast">متن کپی شد ✅</div>
+
+<div id="receiptOverlay">
+  <div id="receiptCard">
+    <div id="receiptClose">✕</div>
+    <div class="r-header">
+      <div class="r-logo">🎮 Persian Store</div>
+      <div class="r-sub">رسید سفارش نصب بازی</div>
+    </div>
+    <div class="r-dashed"></div>
+    <div class="r-row"><span>شماره سفارش</span><span id="rOrderId"></span></div>
+    <div class="r-row"><span>تاریخ</span><span id="rDate"></span></div>
+    <div class="r-row"><span>مشتری</span><span id="rName"></span></div>
+    <div class="r-dashed"></div>
+    <ul id="rItems"></ul>
+    <div class="r-dashed"></div>
+    <div class="r-row"><span>حجم کل</span><span id="rSize"></span></div>
+    <div class="r-row r-total"><span>مبلغ کل</span><span id="rTotal"></span></div>
+    <div class="r-dashed"></div>
+    <div class="r-footer">با تشکر از خرید شما 🙏</div>
+    <div class="r-zigzag"></div>
+  </div>
+</div>
 
 <script>
 const games = [
@@ -1084,7 +1210,7 @@ function priceFor(consoleName){
   return consoleName === 'PS5' ? PRICE_PS5 : PRICE_PS4;
 }
 
-const SMS_NUMBER = '0910340487';
+const SMS_NUMBER = '+989103404687';
 const selected = new Set();
 const btnByName = {};
 const coverMap = {};
@@ -1279,6 +1405,45 @@ copyBtn.addEventListener('click', async () => {
   }
   copyToast.classList.add('show');
   setTimeout(() => copyToast.classList.remove('show'), 2000);
+});
+
+// ---- receipt ----
+const receiptOverlay = document.getElementById('receiptOverlay');
+const receiptBtn = document.getElementById('receiptModal');
+const rItems = document.getElementById('rItems');
+
+receiptBtn.addEventListener('click', () => {
+  const name = validateName();
+  if(!name || selected.size === 0) return;
+
+  const orderId = Date.now().toString().slice(-6);
+  document.getElementById('rOrderId').textContent = '#' + orderId;
+  document.getElementById('rDate').textContent = new Date().toLocaleString('fa-IR', {
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'
+  });
+  document.getElementById('rName').textContent = name;
+
+  rItems.innerHTML = '';
+  selected.forEach(gname => {
+    const li = document.createElement('li');
+    const consoleName = consoleByName[gname] || 'PS4';
+    const gPrice = priceFor(consoleName);
+    li.innerHTML = `<span>${gname.replace(/\s*\(.*?\)\s*/g,'')} <span class="r-item-console">(${consoleName})</span></span><span>${gPrice.toLocaleString('fa-IR')}</span>`;
+    rItems.appendChild(li);
+  });
+
+  const { total, price } = computeTotalSize();
+  document.getElementById('rSize').textContent = total > 0 ? total.toFixed(1).replace(/\.0$/,'') + ' GB' : 'نامشخص';
+  document.getElementById('rTotal').textContent = price.toLocaleString('fa-IR') + ' تومان';
+
+  receiptOverlay.classList.add('show');
+});
+
+document.getElementById('receiptClose').addEventListener('click', () => {
+  receiptOverlay.classList.remove('show');
+});
+receiptOverlay.addEventListener('click', (e) => {
+  if(e.target === receiptOverlay) receiptOverlay.classList.remove('show');
 });
 
 // ---- render / filter / sort ----
